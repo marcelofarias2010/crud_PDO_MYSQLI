@@ -1,5 +1,4 @@
 <?php
-
 include __DIR__ . '/ClassConexao.php';
 
 class ClassCrud extends ClassConexao {
@@ -7,6 +6,8 @@ class ClassCrud extends ClassConexao {
 
     private $Crud;
     private $Contador;
+    private $login;
+    private $senha;
 
     #Preparação das declarativas
 
@@ -58,29 +59,26 @@ class ClassCrud extends ClassConexao {
     #validar usuário
 
     public function validaUser($user, $pass) {
-        $usuario = $user;
-        $senha = $pass;
-
-        $sql = "SELECT * FROM usuario WHERE usuario = :login' AND senha = :senha LIMIT 1";
-
-        try {
-            $databas = $this->conectaDB();
-        } catch (PDOException $e) {
-            echo 'Connection failed: ' . $e->getMessage();
-        }
-
-        $statement = $databas->prepare($sql);
-
-        $statement->execute(array(':login' => $usuario, ':senha' => $senha));
-        $row = $statement->fetch();
+        $this->login = $user;
+        $this->senha = $pass;
+        $sql = "SELECT * FROM usuario WHERE usuario = :login AND senha = :senha LIMIT 1";
+        $this->Crud = $this->conectaDB()->prepare($sql);
+        $this->Crud->bindValue(":login",$this->login);
+        $this->Crud->bindValue(":senha",$this->senha);
+        $this->Crud->execute();
         
-
-        if (empty($row)) {
+        if ($this->Crud->rowCount() == 1) {
+            while ($ln = $this->Crud->fetch(PDO::FETCH_ASSOC)) {
+                $_SESSION['emailUser'] = $ln['usuario'];
+                $_SESSION['senhaUser'] = $ln['senha'];
+                $_SESSION['nomeUser'] = $ln['nome'];
+                $_SESSION['idUser'] = $ln['id'];             
+                
+                header("Location:index.php");
+            }
+        } else {
             $_SESSION['loginErro'] = "Usuário ou senha inválido";
-            header("Location: entrar.php");
-        } elseif (isset($row)) {
-            $_SESSION['usuarioNome'] = $row['nome'];
-            header("Location: index.php");
+            header("Location:entrar.php");
         }
     }
 

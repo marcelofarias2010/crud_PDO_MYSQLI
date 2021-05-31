@@ -1,5 +1,10 @@
 <?php
+session_start();
+if(!isset($_SESSION['nomeUser'])){
+    header("Location:entrar.php");
+}
 include './Includes/Header.php';
+echo "Seja bem vindo ".$_SESSION['nomeUser'];
 ?>
 
 <div class="content">
