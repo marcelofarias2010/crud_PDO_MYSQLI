@@ -4,7 +4,7 @@ if(!isset($_SESSION['nomeUser'])){
     header("Location:entrar.php");
 }
 include './Includes/Header.php';
-echo "Seja bem vindo ".$_SESSION['nomeUser'];
+echo "<h3 style='text-align:center'>Seja bem vindo ".$_SESSION['nomeUser']."</h3>";
 ?>
 
 <div class="content">
